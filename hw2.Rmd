@@ -1,0 +1,51 @@
+---
+title: "hw2 Yirun Wang (aaron.wang@wisc.edu)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Introduction**\
+\
+In order to find the closest measure of the cB58, I first tried to use Manhattan distance to measure the distance between each point. The reason I use Manhattan distance is that I believe calculating the distance between each point is the most stright-forward method to find the closest spectrum. The first step is to standardize the flux. Since there is no built-in function in R to calculate the Manhattan distance, I wrote the function by myself. However, it did not work since it did not put the noisy version of cB58 in the top three distance. Then, I used another distance which is Minkowski distance. As for this distance, I chose p = 3 and p = 4 but none of them worked. I believe one of the reasons for the failure is the value of k. Keeping all the codes the same, I finally turned to Euclidean distance. This distance finally put the noisy version in the third place. By plotting the graph, there is enough evidence that this method is effective.
+
+
+```{r}
+rm(list=ls())
+require("FITSio")
+cB58 = readFrameFromFITS("cB58_Lyman_break.fit") 
+n=dim(cB58)[1]
+spec = read.csv(file = 'hw2.csv')
+new_cB58 = (cB58$FLUX-mean(cB58$FLUX))/sd(cB58$FLUX)
+```
+## Fitting Plots
+
+```{r}
+n=dim(cB58)[1]
+spec1 = readFrameFromFITS(paste(sep="","data/", spec[1, 'spectrumID']))
+data1 = spec1$flux
+point1 = spec[1, 'i']
+new_spec1 = (data1-mean(data1))/sd(data1)
+plot(x=1:dim(spec1)[1], y=new_spec1, type='n', main = 'Fitting Graph For The First Spectrum',xlab = 'Shifted Wavelength',ylab = 'Rescaled Flux'); lines(x=1:dim(spec1)[1],y= new_spec1, col = 'blue'); lines(x=point1:(point1+n-1),y=new_cB58,col='red')
+legend("top", legend=c(paste(sep = "","SDSS (noisy) cB58 in " , spec[1, 'spectrumID']), "cB58 (low noise) in cB58_Lyman_break.fit"), col=c("blue", "red"), lty=c(1, 1))
+```
+
+```{r}
+spec2 = readFrameFromFITS(paste(sep="","data/", spec[2, 'spectrumID']))
+data2 = spec2$flux
+point2 = spec[2, 'i']
+new_spec2 = (data2-mean(data2))/sd(data2)
+plot(x=1:dim(spec2)[1], y=new_spec2, type='n', main = 'Fitting Graph For The Second Spectrum',xlab = 'Shifted Wavelength',ylab = 'Rescaled Flux'); lines(x=1:dim(spec2)[1],y= new_spec2, col = 'blue'); lines(x=point2:(point2+n-1),y=new_cB58,col='red')
+legend("top", legend=c(paste(sep = "","SDSS (noisy) cB58 in " ,spec[2, 'spectrumID']) , "cB58 (low noise) in cB58_Lyman_break.fit"), col=c("blue", "red"), lty=c(1, 1))
+```
+
+```{r}
+spec3 = readFrameFromFITS(paste(sep="","data/", spec[3, 'spectrumID']))
+data3 = spec3$flux
+point3 = spec[3, 'i']
+new_spec3 = (data3-mean(data3))/sd(data3)
+plot(x=1:dim(spec3)[1], y=new_spec3, type='n', main = 'Fitting Graph For The Third Spectrum',xlab = 'Shifted Wavelength',ylab = 'Rescaled Flux'); lines(x=1:dim(spec3)[1],y= new_spec3, col = 'blue'); lines(x=point3:(point3+n-1),y=new_cB58,col='red')
+legend("top", legend=c(paste(sep = "","SDSS (noisy) cB58 in " ,spec[3, 'spectrumID']) , "cB58 (low noise) in cB58_Lyman_break.fit"), col=c("blue", "red"), lty=c(1, 1))
+```
